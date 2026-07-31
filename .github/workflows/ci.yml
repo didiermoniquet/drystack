@@ -1,0 +1,24 @@
+name: CI
+
+# Runs the syntax check and unit tests on every push and pull request.
+# Publishing to GitHub Pages is handled by the repository's Pages setting
+# (Deploy from a branch: main / root) — no build step is required.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax check
+        run: npm run check
+      - name: Unit tests
+        run: npm test

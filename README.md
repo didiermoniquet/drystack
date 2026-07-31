@@ -102,15 +102,19 @@ works from `https://<user>.github.io/<repo>/` as well as a custom domain.
 `.nojekyll` is included so paths beginning with `_` or nested folders are served
 verbatim.
 
-**Option A — deploy from a branch (no CI):**
-1. Push to the repository.
-2. Repo → *Settings* → *Pages* → *Source:* **Deploy from a branch**.
-3. Choose the `main` branch and the `/ (root)` folder, then save.
-4. Visit the published URL.
+**Enable Pages once (one-time, requires repo admin):**
+1. Repo → *Settings* → *Pages* → *Source:* **Deploy from a branch**.
+2. Choose the `main` branch and the `/ (root)` folder, then *Save*.
+3. Wait ~1 minute and visit the published URL. Every later push to `main`
+   redeploys automatically — no build step.
 
-**Option B — GitHub Actions (included):** `.github/workflows/deploy.yml` runs the
-syntax check and tests, then publishes the repository to Pages on every push to
-`main`. Enable it under *Settings* → *Pages* → *Source:* **GitHub Actions**.
+> GitHub only lets a repository **admin** turn Pages on for the first time; it
+> can't be enabled by a push or a workflow token on a repo that has never had
+> Pages. After that first toggle, deployment is automatic.
+
+Continuous integration (`.github/workflows/ci.yml`) runs the syntax check and
+unit tests on every push and pull request; it does not deploy, so publishing and
+CI never conflict.
 
 ## Project structure
 
