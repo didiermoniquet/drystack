@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Drystack icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1626"/>
+      <stop offset="1" stop-color="#070a12"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <g stroke="#04121a" stroke-width="6">
+    <!-- a dry-stacked pile of blocks -->
+    <rect x="140" y="300" width="80" height="80" rx="10" fill="#22d3ee"/>
+    <rect x="220" y="300" width="80" height="80" rx="10" fill="#22d3ee"/>
+    <rect x="300" y="300" width="80" height="80" rx="10" fill="#22d3ee"/>
+    <rect x="180" y="220" width="80" height="80" rx="10" fill="#a78bfa"/>
+    <rect x="260" y="220" width="80" height="80" rx="10" fill="#a78bfa"/>
+    <rect x="220" y="140" width="80" height="80" rx="10" fill="#fbbf24"/>
+  </g>
+</svg>

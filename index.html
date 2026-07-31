@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+  />
+  <meta name="theme-color" content="#0b0f1a" />
+  <meta name="color-scheme" content="dark" />
+  <meta
+    name="description"
+    content="Drystack — an original, mobile-friendly falling-block puzzle game. Keyboard and touch, offline-ready."
+  />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Drystack" />
+  <title>Drystack — Falling Block Puzzle</title>
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <!-- ===================== MAIN MENU ===================== -->
+  <section id="screen-menu" class="screen screen-menu" aria-label="Main menu">
+    <div class="menu-card">
+      <h1 class="logo">DRY<span>STACK</span></h1>
+      <p class="tagline">Stack them dry. Clear the lines. Don't top out.</p>
+
+      <p class="menu-highscore">
+        High score: <strong id="menu-high">0</strong>
+      </p>
+
+      <div class="menu-actions">
+        <button id="btn-play" class="btn btn-primary" type="button">Play</button>
+        <button id="btn-controls" class="btn" type="button">Controls</button>
+        <button id="btn-settings" class="btn" type="button">Settings</button>
+      </div>
+
+      <details class="menu-help">
+        <summary>How to play</summary>
+        <p>
+          Move and rotate the falling pieces to fill complete horizontal lines.
+          Full lines clear and score points. Clear more lines at once for a
+          bigger bonus. The game speeds up as you level up. If a new piece can't
+          fit, it's game over.
+        </p>
+      </details>
+
+      <p class="legal-note">
+        An independent falling-block puzzle game. Not affiliated with, endorsed
+        by, or derived from any commercial product.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== GAME ===================== -->
+  <main id="screen-game" class="screen screen-game" hidden aria-label="Game">
+    <div class="stage">
+      <!-- Left panel: hold + score -->
+      <aside class="panel panel-left" aria-label="Hold and score">
+        <div class="panel-block">
+          <h2 class="panel-title">Hold</h2>
+          <canvas id="hold-canvas" class="mini-canvas" width="96" height="96"
+            aria-label="Held piece"></canvas>
+        </div>
+        <dl class="stats">
+          <div class="stat">
+            <dt>Score</dt>
+            <dd id="hud-score" aria-live="polite">0</dd>
+          </div>
+          <div class="stat">
+            <dt>Best</dt>
+            <dd id="hud-high">0</dd>
+          </div>
+        </dl>
+      </aside>
+
+      <!-- Board -->
+      <div class="board-wrap">
+        <canvas id="board-canvas" class="board-canvas"
+          aria-label="Play field"></canvas>
+        <button id="tb-pause" class="pause-chip" type="button" aria-label="Pause">
+          <span aria-hidden="true">II</span>
+        </button>
+      </div>
+
+      <!-- Right panel: next + level/lines -->
+      <aside class="panel panel-right" aria-label="Next pieces and progress">
+        <div class="panel-block">
+          <h2 class="panel-title">Next</h2>
+          <div id="next-list" class="next-list">
+            <canvas class="mini-canvas" width="72" height="56" aria-label="Next piece 1"></canvas>
+            <canvas class="mini-canvas" width="72" height="56" aria-label="Next piece 2"></canvas>
+            <canvas class="mini-canvas" width="72" height="56" aria-label="Next piece 3"></canvas>
+            <canvas class="mini-canvas" width="72" height="56" aria-label="Next piece 4"></canvas>
+            <canvas class="mini-canvas" width="72" height="56" aria-label="Next piece 5"></canvas>
+          </div>
+        </div>
+        <dl class="stats">
+          <div class="stat">
+            <dt>Level</dt>
+            <dd id="hud-level">1</dd>
+          </div>
+          <div class="stat">
+            <dt>Lines</dt>
+            <dd id="hud-lines">0</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+
+    <!-- Touch controls -->
+    <div class="touch-controls" aria-label="Touch controls">
+      <div class="tc-cluster tc-left">
+        <button id="tb-left" class="tc-btn" type="button" aria-label="Move left">
+          <span aria-hidden="true">◀</span>
+        </button>
+        <button id="tb-soft" class="tc-btn" type="button" aria-label="Soft drop">
+          <span aria-hidden="true">▼</span>
+        </button>
+        <button id="tb-right" class="tc-btn" type="button" aria-label="Move right">
+          <span aria-hidden="true">▶</span>
+        </button>
+      </div>
+      <div class="tc-cluster tc-right">
+        <button id="tb-rotccw" class="tc-btn" type="button" aria-label="Rotate counter-clockwise">
+          <span aria-hidden="true">↺</span>
+        </button>
+        <button id="tb-rotcw" class="tc-btn" type="button" aria-label="Rotate clockwise">
+          <span aria-hidden="true">↻</span>
+        </button>
+        <button id="tb-hold" class="tc-btn" type="button" aria-label="Hold piece">
+          <span aria-hidden="true">⇄</span>
+        </button>
+        <button id="tb-hard" class="tc-btn tc-hard" type="button" aria-label="Hard drop">
+          <span aria-hidden="true">⤓</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== OVERLAYS ===================== -->
+  <div id="overlay-pause" class="overlay" role="dialog" aria-modal="true"
+    aria-labelledby="pause-title" hidden>
+    <div class="overlay-card">
+      <h2 id="pause-title">Paused</h2>
+      <div class="overlay-actions">
+        <button id="btn-resume" class="btn btn-primary" type="button">Resume</button>
+        <button id="btn-restart" class="btn" type="button">Restart</button>
+        <button id="btn-pause-settings" class="btn" type="button">Settings</button>
+        <button id="btn-menu" class="btn" type="button">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay-gameover" class="overlay" role="dialog" aria-modal="true"
+    aria-labelledby="go-title" hidden>
+    <div class="overlay-card">
+      <h2 id="go-title">Game Over</h2>
+      <p id="go-newhigh" class="badge-new" hidden>New high score!</p>
+      <dl class="result-grid">
+        <div><dt>Score</dt><dd id="go-score">0</dd></div>
+        <div><dt>Best</dt><dd id="go-high">0</dd></div>
+        <div><dt>Lines</dt><dd id="go-lines">0</dd></div>
+        <div><dt>Level</dt><dd id="go-level">1</dd></div>
+      </dl>
+      <div class="overlay-actions">
+        <button id="btn-again" class="btn btn-primary" type="button">Play Again</button>
+        <button id="btn-menu-2" class="btn" type="button">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay-settings" class="overlay" role="dialog" aria-modal="true"
+    aria-labelledby="settings-title" hidden>
+    <div class="overlay-card">
+      <h2 id="settings-title">Settings</h2>
+      <form class="settings-form" novalidate>
+        <label class="setting">
+          <span>Ghost piece</span>
+          <input id="set-ghost" type="checkbox" />
+        </label>
+        <label class="setting">
+          <span>Reduced motion</span>
+          <input id="set-reduced" type="checkbox" />
+        </label>
+        <label class="setting">
+          <span>Sound effects</span>
+          <input id="set-sound" type="checkbox" />
+        </label>
+        <label class="setting">
+          <span>Volume</span>
+          <input id="set-volume" type="range" min="0" max="1" step="0.05" />
+        </label>
+      </form>
+      <div class="overlay-actions">
+        <button id="btn-settings-close" class="btn btn-primary" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay-controls" class="overlay" role="dialog" aria-modal="true"
+    aria-labelledby="controls-title" hidden>
+    <div class="overlay-card">
+      <h2 id="controls-title">Controls</h2>
+      <div class="controls-grid">
+        <div><span class="key">← →</span> Move</div>
+        <div><span class="key">↓</span> Soft drop</div>
+        <div><span class="key">Space</span> Hard drop</div>
+        <div><span class="key">↑ / X</span> Rotate CW</div>
+        <div><span class="key">Z</span> Rotate CCW</div>
+        <div><span class="key">C / Shift</span> Hold</div>
+        <div><span class="key">P / Esc</span> Pause</div>
+        <div><span class="key">R</span> Restart</div>
+      </div>
+      <p class="controls-note">
+        On touch devices, use the on-screen buttons. Left, right, and soft drop
+        support press-and-hold.
+      </p>
+      <div class="overlay-actions">
+        <button id="btn-controls-close" class="btn btn-primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+  <script>
+    // Register the service worker with a base-relative path so it works from a
+    // GitHub Pages subpath. Failure is non-fatal — the game runs without it.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const base = new URL('.', window.location.href).pathname;
+        navigator.serviceWorker.register(base + 'service-worker.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+/* Drystack — visual identity and responsive layout.
+   Dark, high-contrast, mobile-first. Layout preserves the board's 1:2 ratio
+   (the renderer sizes the canvas itself); this file lays out the surrounding
+   panels and controls for desktop, portrait, and landscape. */
+
+:root {
+  --bg: #070a12;
+  --bg-panel: #121826;
+  --bg-panel-2: #1b2436;
+  --board-frame: #2a3550;
+  --text: #eef2fb;
+  --text-dim: #9aa7c2;
+  --accent: #22d3ee;
+  --accent-2: #a78bfa;
+  --danger: #fb7185;
+  --focus: #ffd166;
+  --radius: 12px;
+  --gap: clamp(6px, 1.6vw, 18px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  padding:
+    calc(var(--safe-t) + var(--gap))
+    calc(var(--safe-r) + var(--gap))
+    calc(var(--safe-b) + var(--gap))
+    calc(var(--safe-l) + var(--gap));
+}
+[hidden] { display: none !important; }
+
+/* ---------------- Typography & buttons ---------------- */
+
+h1, h2 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--bg-panel-2);
+  background: var(--bg-panel-2);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.7em 1.1em;
+  border-radius: 10px;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover { background: #24304a; }
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  background: linear-gradient(180deg, var(--accent), #0ea5b7);
+  border-color: transparent;
+  color: #04121a;
+}
+.btn-primary:hover { filter: brightness(1.06); background: linear-gradient(180deg, var(--accent), #0ea5b7); }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ---------------- Main menu ---------------- */
+
+.screen-menu {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #16223c 0%, transparent 60%),
+    var(--bg);
+}
+.menu-card {
+  width: min(440px, 100%);
+  background: var(--bg-panel);
+  border: 1px solid var(--board-frame);
+  border-radius: var(--radius);
+  padding: clamp(20px, 5vw, 36px);
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+.logo {
+  font-size: clamp(2.4rem, 9vw, 3.4rem);
+  line-height: 1;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.logo span { color: var(--text); -webkit-text-fill-color: var(--text); }
+.tagline { color: var(--text-dim); margin: 0.6em 0 1.4em; }
+.menu-highscore { margin: 0 0 1.2em; color: var(--text-dim); }
+.menu-highscore strong { color: var(--text); font-size: 1.2em; }
+.menu-actions { display: grid; gap: 10px; margin-bottom: 1.2em; }
+.menu-actions .btn { width: 100%; }
+.menu-help { text-align: left; color: var(--text-dim); font-size: 0.9rem; }
+.menu-help summary { cursor: pointer; color: var(--text); margin-bottom: 0.4em; }
+.legal-note {
+  margin: 1.4em 0 0;
+  font-size: 0.72rem;
+  color: #6b7794;
+  line-height: 1.4;
+}
+
+/* ---------------- Game layout ---------------- */
+
+.screen-game { display: flex; flex-direction: column; gap: var(--gap); }
+
+.stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: "left right" "board board";
+  gap: var(--gap);
+}
+
+.panel {
+  display: flex;
+  gap: var(--gap);
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--board-frame);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  min-width: 0;
+  overflow: hidden;
+}
+.panel-left { grid-area: left; }
+.panel-right { grid-area: right; justify-content: flex-end; }
+.panel-block { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.panel-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+.mini-canvas {
+  display: block;
+  background: #0b0f1a;
+  border-radius: 8px;
+  width: 34px;
+  height: 30px;
+}
+#hold-canvas { width: 46px; height: 46px; }
+.next-list { display: flex; gap: 4px; }
+/* Small screens show three upcoming pieces; desktop restores all five. */
+.next-list .mini-canvas:nth-child(n + 4) { display: none; }
+
+.stats { display: flex; gap: var(--gap); margin: 0; }
+.stat { display: flex; flex-direction: column; min-width: 0; }
+.stat dt {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+.stat dd {
+  margin: 0;
+  font-size: clamp(1rem, 4.5vw, 1.4rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.board-wrap {
+  grid-area: board;
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  min-width: 0;
+}
+.board-canvas {
+  display: block;
+  border: 2px solid var(--board-frame);
+  border-radius: 6px;
+  background: #0b0f1a;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+}
+.pause-chip {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--board-frame);
+  background: rgba(18, 24, 38, 0.85);
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+/* ---------------- Touch controls ---------------- */
+
+.touch-controls {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+.tc-cluster { display: flex; gap: 10px; }
+.tc-left { flex: 0 1 auto; }
+.tc-right {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 220px;
+  justify-content: end;
+}
+.tc-btn {
+  appearance: none;
+  border: 1px solid var(--board-frame);
+  background: var(--bg-panel-2);
+  color: var(--text);
+  font-size: 1.5rem;
+  border-radius: 14px;
+  width: 100%;
+  min-width: 56px;
+  min-height: 56px;
+  height: clamp(56px, 9vh, 76px);
+  cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  display: grid;
+  place-items: center;
+}
+.tc-left .tc-btn { width: clamp(56px, 18vw, 84px); }
+.tc-btn.is-pressed { background: var(--accent); color: #04121a; transform: translateY(1px); }
+.tc-hard { grid-column: span 2; background: #26324c; }
+
+/* ---------------- Overlays ---------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--safe-t) + 16px) 16px calc(var(--safe-b) + 16px);
+  background: rgba(4, 7, 14, 0.72);
+  backdrop-filter: blur(3px);
+}
+.overlay-card {
+  width: min(400px, 100%);
+  background: var(--bg-panel);
+  border: 1px solid var(--board-frame);
+  border-radius: var(--radius);
+  padding: clamp(18px, 5vw, 30px);
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+.overlay-card h2 { font-size: 1.7rem; margin-bottom: 0.6em; }
+.overlay-actions { display: grid; gap: 10px; margin-top: 1.2em; }
+.overlay-actions .btn { width: 100%; }
+
+.badge-new {
+  display: inline-block;
+  margin: 0 0 0.8em;
+  padding: 0.3em 0.9em;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #04121a;
+  font-weight: 800;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0;
+}
+.result-grid div {
+  background: var(--bg-panel-2);
+  border-radius: 10px;
+  padding: 10px;
+}
+.result-grid dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+.result-grid dd {
+  margin: 0.2em 0 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-form { display: grid; gap: 6px; text-align: left; }
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--bg-panel-2);
+  min-height: 44px;
+}
+.setting input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); }
+.setting input[type="range"] { width: 55%; accent-color: var(--accent); }
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  text-align: left;
+  margin-bottom: 1em;
+}
+.controls-grid div { color: var(--text-dim); font-size: 0.9rem; }
+.key {
+  display: inline-block;
+  min-width: 2em;
+  padding: 0.15em 0.5em;
+  margin-right: 0.4em;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--board-frame);
+  border-radius: 6px;
+  color: var(--text);
+  font-weight: 700;
+  text-align: center;
+}
+.controls-note { color: var(--text-dim); font-size: 0.85rem; }
+
+/* ---------------- Desktop / wide ---------------- */
+
+@media (min-width: 820px) {
+  .stage {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: clamp(14px, 2vw, 28px);
+  }
+  .panel {
+    flex: 0 0 clamp(130px, 16vw, 190px);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 16px;
+  }
+  .panel-right { justify-content: flex-start; }
+  .stats { flex-direction: column; gap: 12px; }
+  .mini-canvas { width: 100%; height: 52px; }
+  #hold-canvas { width: 100%; height: 84px; }
+  .next-list { flex-direction: column; }
+  .next-list .mini-canvas:nth-child(n + 4) { display: block; }
+  .board-wrap { flex: 1 1 auto; }
+}
+
+/* Hide touch controls on precise-pointer desktops (keyboard is primary). */
+@media (hover: hover) and (pointer: fine) and (min-width: 820px) {
+  .touch-controls { display: none; }
+}
+
+/* ---------------- Landscape / short viewports ----------------
+   When height is scarce, the vertical side panels must not overflow. Shrink
+   the panel contents and show only three upcoming pieces so Level/Lines stay
+   visible without the page clipping or scrolling. */
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .screen {
+    padding:
+      calc(var(--safe-t) + 6px)
+      calc(var(--safe-r) + 8px)
+      calc(var(--safe-b) + 6px)
+      calc(var(--safe-l) + 8px);
+  }
+  .screen-game { gap: 8px; }
+
+  .panel {
+    gap: 8px;
+    padding: 8px;
+    overflow: hidden;
+    justify-content: space-between;
+  }
+  .panel-title { font-size: 0.55rem; }
+  #hold-canvas { height: 46px; width: 46px; }
+  .mini-canvas { height: 30px; }
+  /* Show three previews to save vertical space. */
+  .next-list .mini-canvas:nth-child(n + 4) { display: none; }
+  .stats { gap: 8px; }
+  .stat dd { font-size: 1.05rem; }
+
+  .touch-controls { gap: 8px; }
+  .tc-btn { height: clamp(44px, 17vh, 60px); font-size: 1.25rem; }
+}
+
+/* ---------------- Reduced motion ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+.reduced-motion * { transition: none !important; animation: none !important; }
