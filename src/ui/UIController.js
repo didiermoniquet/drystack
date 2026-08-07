@@ -149,12 +149,14 @@ export class UIController {
       document.body.classList.add('phasing');
       if (this.el.phaseHint) this.el.phaseHint.hidden = false;
       this.#updatePhase();
+      this.#reflow(); // hint + up-button change the layout; refit the board
     });
     g.on('phaseend', () => {
       document.body.classList.remove('phasing');
       if (this.el.phaseHint) this.el.phaseHint.hidden = true;
       this.#updatePhase();
       this.#refreshPieces();
+      this.#reflow();
     });
     g.on('phasefill', () => this.audio.play('lineclear'));
   }
@@ -233,6 +235,12 @@ export class UIController {
   /** Re-render mini canvases after a layout change. */
   refreshPreviews() {
     this.#refreshPieces();
+  }
+
+  // Refit the board canvas after a layout change (e.g. the phase hint/up button
+  // appearing or disappearing changes the available height).
+  #reflow() {
+    requestAnimationFrame(() => this.renderer.resize());
   }
 
   // --- screens & overlays --------------------------------------------------

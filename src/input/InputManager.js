@@ -20,6 +20,8 @@ export class InputManager {
 
     this.soft = false;
     this.softTimer = 0;
+    this.up = false; // phantom move-up (phasing only)
+    this.upTimer = 0;
   }
 
   /** Clear all held state (call on pause, blur, or state changes). */
@@ -31,6 +33,8 @@ export class InputManager {
     this.dasCharged = false;
     this.soft = false;
     this.softTimer = 0;
+    this.up = false;
+    this.upTimer = 0;
   }
 
   #move(dir) {
@@ -81,6 +85,16 @@ export class InputManager {
 
   releaseSoft() {
     this.soft = false;
+  }
+
+  pressUp() {
+    this.up = true;
+    this.upTimer = 0;
+    this.game.moveUp();
+  }
+
+  releaseUp() {
+    this.up = false;
   }
 
   /** One-shot actions. */
@@ -138,6 +152,19 @@ export class InputManager {
         this.softTimer -= this.rules.softDropIntervalMs;
         if (!this.game.softDrop()) break;
         this.audio?.play('softdrop');
+        guard++;
+      }
+    }
+
+    if (this.up) {
+      this.upTimer += dt;
+      let guard = 0;
+      while (
+        this.upTimer >= this.rules.softDropIntervalMs &&
+        guard < this.rules.boardHeight
+      ) {
+        this.upTimer -= this.rules.softDropIntervalMs;
+        if (!this.game.moveUp()) break;
         guard++;
       }
     }

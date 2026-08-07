@@ -13,7 +13,7 @@ dependencies, no backend, no account.
 
 ## Demo
 
-![The Phantom mechanic: a flashing phantom passes through the stack, seats into a buried hole, and clears two lines](./assets/phantom-demo.gif?v=2)
+![The Phantom mechanic: a flashing phantom passes through the stack, seats into a buried hole, and clears two lines](./assets/phantom-demo.gif?v=3)
 
 *The signature **Phantom ✦** mechanic — a phantom piece phases through the stack
 to fill a buried hole you can't reach from the top, clearing the line. (Colors

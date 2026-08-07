@@ -105,6 +105,38 @@ test('cancelling phase restores the original piece for free', () => {
   assert.equal(g.active.y, 0);
 });
 
+test('the phantom can move up while phasing, bounded to the visible field', () => {
+  const g = newGame();
+  g.phaseCharges = 1;
+  g.active = new Piece('O', 4, 10, 0);
+  assert.equal(g.moveUp(), false); // no effect before phasing
+  g.activatePhase();
+  assert.ok(g.moveUp());
+  assert.equal(g.active.y, 9);
+  for (let i = 0; i < 40; i++) g.moveUp(); // hit the visible ceiling
+  const minRow = Math.min(...g.active.cells().map(([, y]) => y));
+  assert.ok(minRow >= g.board.hiddenRows, 'phantom stays on screen');
+});
+
+test('phase seat targets the buried pocket nearest the phantom', () => {
+  const g = newGame();
+  const maxY = (cells) => Math.max(...cells.map(([, y]) => y));
+  // Lower covered pocket (rows 20-21) and an upper one (rows 8-9), cols 4-5.
+  for (let y = 20; y <= 21; y++)
+    for (let x = 0; x < 10; x++) if (x !== 4 && x !== 5) g.board.set(x, y, 'X');
+  g.board.set(4, 19, 'X'); g.board.set(5, 19, 'X');
+  for (let y = 8; y <= 9; y++)
+    for (let x = 0; x < 10; x++) if (x !== 4 && x !== 5) g.board.set(x, y, 'X');
+  g.board.set(4, 7, 'X'); g.board.set(5, 7, 'X');
+
+  g.phaseCharges = 1;
+  g.active = new Piece('O', 4, 8, 0); // aimed at the upper pocket
+  g.activatePhase();
+  assert.equal(maxY(g.getPhaseSeatCells()), 9);
+  for (let i = 0; i < 12; i++) g.softDrop(); // lower the phantom
+  assert.equal(maxY(g.getPhaseSeatCells()), 21); // now targets the lower pocket
+});
+
 test('getPhaseSeatCells previews a valid seat and is null otherwise', () => {
   const g = newGame();
   buildBuriedPocket(g, { covered: true });

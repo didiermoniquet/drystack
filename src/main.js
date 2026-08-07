@@ -53,6 +53,7 @@ function boot() {
       left: document.getElementById('tb-left'),
       right: document.getElementById('tb-right'),
       softDrop: document.getElementById('tb-soft'),
+      up: document.getElementById('tb-up'),
       hardDrop: document.getElementById('tb-hard'),
       rotateCW: document.getElementById('tb-rotcw'),
       rotateCCW: document.getElementById('tb-rotccw'),

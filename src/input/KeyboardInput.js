@@ -43,6 +43,9 @@ export class KeyboardInput {
       case 'ArrowDown':
         this.input.pressSoft();
         break;
+      case 'KeyW':
+        this.input.pressUp(); // phantom move-up (only acts while phasing)
+        break;
       case 'Space':
         this.input.tap('hardDrop');
         break;
@@ -83,6 +86,9 @@ export class KeyboardInput {
         break;
       case 'ArrowDown':
         this.input.releaseSoft();
+        break;
+      case 'KeyW':
+        this.input.releaseUp();
         break;
       default:
         break;

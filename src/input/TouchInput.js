@@ -6,7 +6,7 @@
 // double-tap zoom, and text selection; pressed-state feedback is applied via a
 // CSS class.
 
-const HOLD_ACTIONS = new Set(['left', 'right', 'softDrop']);
+const HOLD_ACTIONS = new Set(['left', 'right', 'softDrop', 'up']);
 
 export class TouchInput {
   constructor(input, buttons, { onPauseToggle } = {}) {
@@ -54,6 +54,9 @@ export class TouchInput {
       case 'softDrop':
         this.input.pressSoft();
         break;
+      case 'up':
+        this.input.pressUp();
+        break;
       case 'hardDrop':
         this.input.tap('hardDrop');
         break;
@@ -82,6 +85,7 @@ export class TouchInput {
     if (action === 'left') this.input.releaseLeft();
     else if (action === 'right') this.input.releaseRight();
     else if (action === 'softDrop') this.input.releaseSoft();
+    else if (action === 'up') this.input.releaseUp();
   }
 
   detach() {

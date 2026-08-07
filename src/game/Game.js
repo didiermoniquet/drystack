@@ -376,6 +376,18 @@ export class Game extends Emitter {
     return this.state === State.PHASING ? this.cancelPhase() : this.activatePhase();
   }
 
+  /** Move the phantom up one row, kept within the visible field. */
+  moveUp() {
+    if (this.state !== State.PHASING) return false;
+    const cells = this.active.cells(this.active.rotation, this.active.x, this.active.y - 1);
+    if (!this.#inBounds(cells)) return false;
+    for (let i = 0; i < cells.length; i++) {
+      if (cells[i][1] < this.board.hiddenRows) return false; // stay on-screen
+    }
+    this.active.y -= 1;
+    return true;
+  }
+
   // A cell is "covered" (inaccessible from above) when a filled cell sits above
   // it in the same column.
   #isCovered(x, y) {
@@ -385,12 +397,15 @@ export class Game extends Emitter {
     return false;
   }
 
-  // Lowest y at the current column/rotation where every phantom cell lands in
-  // an empty, covered hole. Null when there is no legal seat here.
+  // The valid seat nearest the phantom's current row, so up/down aim selects
+  // which buried pocket to fill. A seat is valid when every phantom cell lands
+  // in an empty, covered hole. Null when there is no legal seat in this column.
   #findPhaseSeatY() {
     const rot = this.active.rotation;
     const x = this.active.x;
-    for (let y = this.board.totalRows - 1; y >= 0; y--) {
+    let best = null;
+    let bestDist = Infinity;
+    for (let y = 0; y < this.board.totalRows; y++) {
       const cells = this.active.cells(rot, x, y);
       if (!this.#inBounds(cells)) continue;
       let ok = true;
@@ -400,9 +415,15 @@ export class Game extends Emitter {
           break;
         }
       }
-      if (ok) return y;
+      if (ok) {
+        const dist = Math.abs(y - this.active.y);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = y;
+        }
+      }
     }
-    return null;
+    return best;
   }
 
   /** Cells the phantom would fill if seated now, or null if it can't seat. */

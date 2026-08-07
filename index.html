@@ -89,9 +89,6 @@
         <button id="tb-pause" class="pause-chip" type="button" aria-label="Pause">
           <span aria-hidden="true">II</span>
         </button>
-        <p id="phase-hint" class="phase-hint" role="status" hidden>
-          Slide the phantom into a buried hole · Drop to place · ✦ / F to cancel
-        </p>
       </div>
 
       <!-- Right panel: next + level/lines -->
@@ -128,11 +125,19 @@
       </aside>
     </div>
 
+    <!-- Phase hint: shown only in phantom mode, kept clear of the board. -->
+    <p id="phase-hint" class="phase-hint" role="status" hidden>
+      Move the phantom over a buried hole · Drop to place · ✦ / F to cancel
+    </p>
+
     <!-- Touch controls -->
     <div class="touch-controls" aria-label="Touch controls">
       <div class="tc-cluster tc-left">
         <button id="tb-left" class="tc-btn" type="button" aria-label="Move left">
           <span aria-hidden="true">◀</span>
+        </button>
+        <button id="tb-up" class="tc-btn tc-up" type="button" aria-label="Move phantom up">
+          <span aria-hidden="true">▲</span>
         </button>
         <button id="tb-soft" class="tc-btn" type="button" aria-label="Soft drop">
           <span aria-hidden="true">▼</span>
