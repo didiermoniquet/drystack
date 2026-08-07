@@ -438,7 +438,10 @@ export class Game extends Emitter {
   seatPhase() {
     if (this.state !== State.PHASING) return false;
     const y = this.#findPhaseSeatY();
-    if (y === null) return false; // no buried pocket fits here
+    if (y === null) {
+      this.emit('phasedenied'); // nothing legal under the phantom here
+      return false;
+    }
     const type = this.active.type;
     const cells = this.active.cells(this.active.rotation, this.active.x, y);
     for (const [cx, cy] of cells) this.board.set(cx, cy, type);

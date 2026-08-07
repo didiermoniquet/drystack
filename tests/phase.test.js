@@ -90,6 +90,19 @@ test('seating is rejected when the pocket is not covered (reachable from above)'
   assert.equal(g.state, State.PHASING);
 });
 
+test('seating on an invalid spot emits phasedenied and spends no charge', () => {
+  const g = newGame();
+  g.phaseCharges = 1;
+  g.active = new Piece('O', 0, 5, 0); // open board — nothing buried under it
+  g.activatePhase();
+  let denied = false;
+  g.on('phasedenied', () => (denied = true));
+  assert.equal(g.seatPhase(), false);
+  assert.ok(denied);
+  assert.equal(g.phaseCharges, 1);
+  assert.equal(g.state, State.PHASING);
+});
+
 test('cancelling phase restores the original piece for free', () => {
   const g = newGame();
   g.phaseCharges = 1;

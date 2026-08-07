@@ -15,6 +15,7 @@ const SFX = {
   harddrop: { freq: 120, dur: 0.06, type: 'sawtooth', gain: 0.2 },
   lock: { freq: 160, dur: 0.05, type: 'triangle', gain: 0.18 },
   hold: { freq: 300, dur: 0.05, type: 'triangle', gain: 0.15 },
+  deny: { freq: 95, dur: 0.16, type: 'sawtooth', gain: 0.2 },
   lineclear: { freq: 520, dur: 0.12, type: 'triangle', gain: 0.22 },
   quad: { freq: 660, dur: 0.22, type: 'sawtooth', gain: 0.25 },
   levelup: { freq: 740, dur: 0.18, type: 'triangle', gain: 0.22 },

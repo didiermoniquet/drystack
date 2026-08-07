@@ -100,10 +100,14 @@ export class InputManager {
   /** One-shot actions. */
   tap(action) {
     switch (action) {
-      case 'hardDrop':
+      case 'hardDrop': {
+        // While phasing, hard drop seats the phantom; the phase events drive its
+        // sound (place / deny), so don't also play the hard-drop thud.
+        const phasing = this.game.phasing;
         this.game.hardDrop();
-        this.audio?.play('harddrop');
+        if (!phasing) this.audio?.play('harddrop');
         break;
+      }
       case 'rotateCW':
         if (this.game.rotateCW()) this.audio?.play('rotate');
         break;

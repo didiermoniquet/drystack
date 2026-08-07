@@ -159,6 +159,7 @@ export class UIController {
       this.#reflow();
     });
     g.on('phasefill', () => this.audio.play('lineclear'));
+    g.on('phasedenied', () => this.audio.play('deny'));
   }
 
   #updatePhase() {
