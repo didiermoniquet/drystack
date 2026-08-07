@@ -87,9 +87,9 @@ function draw(size) {
   // stacked blocks (coordinates in a 512 grid, scaled to size)
   const s = size / 512;
   const blocks = [
-    [140, 300, '#22d3ee'], [220, 300, '#22d3ee'], [300, 300, '#22d3ee'],
-    [180, 220, '#a78bfa'], [260, 220, '#a78bfa'],
-    [220, 140, '#fbbf24'],
+    [140, 300, '#2bb8a3'], [220, 300, '#2bb8a3'], [300, 300, '#2bb8a3'],
+    [180, 220, '#f4c333'], [260, 220, '#f4c333'],
+    [220, 140, '#e06fc0'],
   ];
   const bs = Math.round(80 * s);
   const border = hex('#04121a');

@@ -11,7 +11,7 @@
 //
 // Bump CACHE_VERSION whenever cached assets should be force-evicted on upgrade.
 
-const CACHE_VERSION = 'drystack-v2';
+const CACHE_VERSION = 'drystack-v3';
 
 const ASSETS = [
   './',

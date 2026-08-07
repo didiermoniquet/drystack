@@ -7,12 +7,12 @@
   </defs>
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
   <g stroke="#04121a" stroke-width="6">
-    <!-- a dry-stacked pile of blocks -->
-    <rect x="140" y="300" width="80" height="80" rx="10" fill="#22d3ee"/>
-    <rect x="220" y="300" width="80" height="80" rx="10" fill="#22d3ee"/>
-    <rect x="300" y="300" width="80" height="80" rx="10" fill="#22d3ee"/>
-    <rect x="180" y="220" width="80" height="80" rx="10" fill="#a78bfa"/>
-    <rect x="260" y="220" width="80" height="80" rx="10" fill="#a78bfa"/>
-    <rect x="220" y="140" width="80" height="80" rx="10" fill="#fbbf24"/>
+    <!-- a dry-stacked pile of blocks (Drystack's original palette) -->
+    <rect x="140" y="300" width="80" height="80" rx="10" fill="#2bb8a3"/>
+    <rect x="220" y="300" width="80" height="80" rx="10" fill="#2bb8a3"/>
+    <rect x="300" y="300" width="80" height="80" rx="10" fill="#2bb8a3"/>
+    <rect x="180" y="220" width="80" height="80" rx="10" fill="#f4c333"/>
+    <rect x="260" y="220" width="80" height="80" rx="10" fill="#f4c333"/>
+    <rect x="220" y="140" width="80" height="80" rx="10" fill="#e06fc0"/>
   </g>
 </svg>

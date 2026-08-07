@@ -59,9 +59,9 @@ export function createRules(overrides = {}) {
 /**
  * Gravity interval in milliseconds per cell for a given level.
  *
- * Uses the classic guideline curve (time-per-cell shrinks geometrically with
- * level) and clamps to roughly one cell per frame at the top end so the engine
- * never tries to move a piece an unbounded distance in a single tick.
+ * Uses a geometric speed curve (time-per-cell shrinks with each level) and
+ * clamps to roughly one cell per frame at the top end so the engine never tries
+ * to move a piece an unbounded distance in a single tick.
  */
 export function gravityIntervalMs(level) {
   const l = Math.max(1, level);

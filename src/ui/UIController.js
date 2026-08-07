@@ -135,7 +135,7 @@ export class UIController {
     g.on('hold', () => this.#refreshPieces());
     g.on('lock', () => this.audio.play('lock'));
     g.on('lineclearstart', ({ count }) =>
-      this.audio.play(count >= 4 ? 'tetris' : 'lineclear')
+      this.audio.play(count >= 4 ? 'quad' : 'lineclear')
     );
     g.on('lineclear', () => {
       this.#updateHud();

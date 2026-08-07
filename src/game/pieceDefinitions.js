@@ -9,13 +9,15 @@
 //               within the bounding box. Coordinates use screen convention:
 //               x grows right, y grows DOWN.
 //
-// Adding a new piece is just a matter of adding an entry here (and, if it needs
-// custom kicks, extending KICKS). Pieces are not hard-coded anywhere else.
+// The palette is a deliberately original scheme that does NOT follow the
+// conventional per-piece colouring — combined with the per-piece glyphs, this
+// gives Drystack its own visual identity. Adding a new piece is just a matter of
+// adding an entry here (and, if it needs custom kicks, extending KICKS).
 
 export const PIECES = {
   I: {
     box: 4,
-    color: '#22d3ee',
+    color: '#f2704e', // coral
     glyph: 'bar',
     states: [
       [[0, 1], [1, 1], [2, 1], [3, 1]],
@@ -26,7 +28,7 @@ export const PIECES = {
   },
   O: {
     box: 2,
-    color: '#fbbf24',
+    color: '#2bb8a3', // teal
     glyph: 'square',
     states: [
       [[0, 0], [1, 0], [0, 1], [1, 1]],
@@ -37,7 +39,7 @@ export const PIECES = {
   },
   T: {
     box: 3,
-    color: '#a78bfa',
+    color: '#a3c93a', // lime
     glyph: 'triangle',
     states: [
       [[1, 0], [0, 1], [1, 1], [2, 1]],
@@ -48,7 +50,7 @@ export const PIECES = {
   },
   S: {
     box: 3,
-    color: '#34d399',
+    color: '#e06fc0', // orchid
     glyph: 'diagUp',
     states: [
       [[1, 0], [2, 0], [0, 1], [1, 1]],
@@ -59,7 +61,7 @@ export const PIECES = {
   },
   Z: {
     box: 3,
-    color: '#fb7185',
+    color: '#4aa8f0', // azure
     glyph: 'diagDown',
     states: [
       [[0, 0], [1, 0], [1, 1], [2, 1]],
@@ -70,7 +72,7 @@ export const PIECES = {
   },
   J: {
     box: 3,
-    color: '#60a5fa',
+    color: '#f4c333', // gold
     glyph: 'cornerL',
     states: [
       [[0, 0], [0, 1], [1, 1], [2, 1]],
@@ -81,7 +83,7 @@ export const PIECES = {
   },
   L: {
     box: 3,
-    color: '#fb923c',
+    color: '#7c74e6', // indigo
     glyph: 'cornerR',
     states: [
       [[2, 0], [0, 1], [1, 1], [2, 1]],

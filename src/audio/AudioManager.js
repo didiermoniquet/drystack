@@ -16,7 +16,7 @@ const SFX = {
   lock: { freq: 160, dur: 0.05, type: 'triangle', gain: 0.18 },
   hold: { freq: 300, dur: 0.05, type: 'triangle', gain: 0.15 },
   lineclear: { freq: 520, dur: 0.12, type: 'triangle', gain: 0.22 },
-  tetris: { freq: 660, dur: 0.22, type: 'sawtooth', gain: 0.25 },
+  quad: { freq: 660, dur: 0.22, type: 'sawtooth', gain: 0.25 },
   levelup: { freq: 740, dur: 0.18, type: 'triangle', gain: 0.22 },
   pause: { freq: 200, dur: 0.08, type: 'sine', gain: 0.15 },
   gameover: { freq: 90, dur: 0.5, type: 'sawtooth', gain: 0.25 },
