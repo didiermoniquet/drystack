@@ -104,8 +104,12 @@ function drawGlyph(ctx, x, y, s, glyph) {
   ctx.restore();
 }
 
+// Colors for the phantom when its current position has no legal seat.
+const PHANTOM_INVALID_FILL = '#ef4444';
+const PHANTOM_INVALID_OUTLINE = '#fecaca';
+
 // A flashing, translucent phantom cell for the phase piece.
-function drawPhantomCell(ctx, px, py, size, color, alpha) {
+function drawPhantomCell(ctx, px, py, size, color, alpha, outline = '#ffffff') {
   const inset = Math.max(1, size * 0.06);
   const x = px + inset;
   const y = py + inset;
@@ -115,7 +119,7 @@ function drawPhantomCell(ctx, px, py, size, color, alpha) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, s, s);
   ctx.globalAlpha = Math.min(1, alpha + 0.35);
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = outline;
   ctx.lineWidth = Math.max(1, size * 0.08);
   ctx.strokeRect(x + 0.5, y + 0.5, s - 1, s - 1);
   ctx.restore();
@@ -275,19 +279,22 @@ export class Renderer {
   #renderPhase(ctx, game) {
     // Where the phantom would seat (green highlight), if anywhere legal.
     const seat = game.getPhaseSeatCells();
+    const canSeat = !!seat;
     if (seat) {
       for (const [x, y] of seat) {
         if (y < this.hidden) continue;
         drawSeatCell(ctx, x * this.cell, (y - this.hidden) * this.cell, this.cell);
       }
     }
-    // The flashing phantom at its current position.
+    // The flashing phantom at its current position — red when it can't seat here.
     const alpha = this.#phantomAlpha();
+    const fill = canSeat ? game.active.color : PHANTOM_INVALID_FILL;
+    const outline = canSeat ? '#ffffff' : PHANTOM_INVALID_OUTLINE;
     for (const [x, y] of game.active.cells()) {
       if (y < this.hidden) continue;
       drawPhantomCell(
         ctx, x * this.cell, (y - this.hidden) * this.cell, this.cell,
-        game.active.color, alpha
+        fill, alpha, outline
       );
     }
   }
