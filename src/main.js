@@ -57,6 +57,7 @@ function boot() {
       rotateCW: document.getElementById('tb-rotcw'),
       rotateCCW: document.getElementById('tb-rotccw'),
       hold: document.getElementById('tb-hold'),
+      phase: document.getElementById('tb-phase'),
       pause: document.getElementById('tb-pause'),
     },
     { onPauseToggle: () => ui.togglePause() }
@@ -92,7 +93,9 @@ function boot() {
     if (dt > MAX_FRAME_MS) dt = MAX_FRAME_MS;
     if (dt < 0) dt = 0;
 
-    if (game.state === State.PLAYING) input.update(dt);
+    if (game.state === State.PLAYING || game.state === State.PHASING) {
+      input.update(dt);
+    }
     game.tick(dt);
     renderer.render(game);
     requestAnimationFrame(frame);
@@ -100,6 +103,12 @@ function boot() {
   requestAnimationFrame(frame);
 
   ui.showMenu();
+
+  // Optional debugging handle (open with #debug). Lets the engine be inspected
+  // and driven from the console for tuning; absent in normal play.
+  if (/(?:[?#&])debug\b/.test(window.location.href)) {
+    window.drystack = { game, rules, renderer, ui, input, State };
+  }
 }
 
 if (document.readyState === 'loading') {

@@ -8,6 +8,11 @@
 import { PIECES } from '../game/pieceDefinitions.js';
 import { State } from '../game/Game.js';
 
+// Fallback appearance for any cell value that isn't a known piece type (e.g.
+// future garbage/obstacle markers) so the renderer never crashes on new data.
+const UNKNOWN_CELL = { color: '#64748b', glyph: 'square' };
+const cellStyle = (type) => PIECES[type] || UNKNOWN_CELL;
+
 // Draw a single tetromino cell: base fill, a bevel for depth, and a subtle
 // per-type glyph so shapes are distinguishable without relying on color.
 function drawCell(ctx, px, py, size, color, glyph, { ghost = false } = {}) {
@@ -96,6 +101,38 @@ function drawGlyph(ctx, x, y, s, glyph) {
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.stroke();
   }
+  ctx.restore();
+}
+
+// A flashing, translucent phantom cell for the phase piece.
+function drawPhantomCell(ctx, px, py, size, color, alpha) {
+  const inset = Math.max(1, size * 0.06);
+  const x = px + inset;
+  const y = py + inset;
+  const s = size - inset * 2;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, s, s);
+  ctx.globalAlpha = Math.min(1, alpha + 0.35);
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = Math.max(1, size * 0.08);
+  ctx.strokeRect(x + 0.5, y + 0.5, s - 1, s - 1);
+  ctx.restore();
+}
+
+// Highlight where a phase piece would seat (a valid buried pocket).
+function drawSeatCell(ctx, px, py, size) {
+  const inset = Math.max(1, size * 0.06);
+  const x = px + inset;
+  const y = py + inset;
+  const s = size - inset * 2;
+  ctx.save();
+  ctx.fillStyle = 'rgba(52,211,153,0.28)';
+  ctx.fillRect(x, y, s, s);
+  ctx.strokeStyle = 'rgba(52,211,153,0.95)';
+  ctx.lineWidth = Math.max(2, size * 0.09);
+  ctx.strokeRect(x + 1, y + 1, s - 2, s - 2);
   ctx.restore();
 }
 
@@ -202,7 +239,8 @@ export class Renderer {
         if (!type) continue;
         const px = x * this.cell;
         const py = (y - this.hidden) * this.cell;
-        drawCell(ctx, px, py, this.cell, PIECES[type].color, PIECES[type].glyph);
+        const style = cellStyle(type);
+        drawCell(ctx, px, py, this.cell, style.color, style.glyph);
         if (isClearing) {
           ctx.fillStyle = `rgba(255,255,255,${clearFlash})`;
           ctx.fillRect(px, py, this.cell, this.cell);
@@ -210,8 +248,10 @@ export class Renderer {
       }
     }
 
-    // Ghost then active piece (skip while a line clear plays out).
-    if (game.active && game.state !== State.LINE_CLEARING) {
+    if (game.state === State.PHASING && game.active) {
+      this.#renderPhase(ctx, game);
+    } else if (game.active && game.state !== State.LINE_CLEARING) {
+      // Ghost then active piece.
       const ghost = game.getGhostCells();
       if (ghost) {
         for (const [x, y] of ghost) {
@@ -230,6 +270,32 @@ export class Renderer {
         );
       }
     }
+  }
+
+  #renderPhase(ctx, game) {
+    // Where the phantom would seat (green highlight), if anywhere legal.
+    const seat = game.getPhaseSeatCells();
+    if (seat) {
+      for (const [x, y] of seat) {
+        if (y < this.hidden) continue;
+        drawSeatCell(ctx, x * this.cell, (y - this.hidden) * this.cell, this.cell);
+      }
+    }
+    // The flashing phantom at its current position.
+    const alpha = this.#phantomAlpha();
+    for (const [x, y] of game.active.cells()) {
+      if (y < this.hidden) continue;
+      drawPhantomCell(
+        ctx, x * this.cell, (y - this.hidden) * this.cell, this.cell,
+        game.active.color, alpha
+      );
+    }
+  }
+
+  #phantomAlpha() {
+    if (this.reducedMotion) return 0.5;
+    const t = (globalThis.performance ? performance.now() : 0) / 1000;
+    return 0.28 + 0.34 * (0.5 + 0.5 * Math.sin(t * 8));
   }
 
   #clearProgress(game) {

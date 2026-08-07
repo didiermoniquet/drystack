@@ -21,6 +21,7 @@ export const State = {
   PLAYING: 'PLAYING',
   PAUSED: 'PAUSED',
   LINE_CLEARING: 'LINE_CLEARING',
+  PHASING: 'PHASING', // positioning a phase piece through the stack
   GAME_OVER: 'GAME_OVER',
 };
 
@@ -74,6 +75,13 @@ export class Game extends Emitter {
     this._ghostCells = null;
     this._ghostDirty = true;
     this._prevState = null;
+
+    // Phase piece
+    this.phaseCharges = 0;
+    this.phasing = false;
+    this._phaseOrigin = null; // active piece snapshot to restore on cancel
+    this._phaseEarned = 0; // charges already granted (from total lines)
+
     this.state = State.READY;
   }
 
@@ -201,6 +209,27 @@ export class Game extends Emitter {
     return true;
   }
 
+  #inBounds(cells) {
+    for (let i = 0; i < cells.length; i++) {
+      if (!this.board.inBounds(cells[i][0], cells[i][1])) return false;
+    }
+    return true;
+  }
+
+  // A phase piece passes through locked blocks, so it only respects the walls
+  // and floor — not occupied cells — while being positioned.
+  #movePhantom(dx, dy) {
+    const cells = this.active.cells(
+      this.active.rotation,
+      this.active.x + dx,
+      this.active.y + dy
+    );
+    if (!this.#inBounds(cells)) return false;
+    this.active.x += dx;
+    this.active.y += dy;
+    return true;
+  }
+
   // A successful move/rotation while grounded resets the lock timer, up to a
   // capped number of resets so a piece cannot be stalled forever.
   #registerLockReset(kind) {
@@ -215,6 +244,7 @@ export class Game extends Emitter {
   }
 
   moveLeft() {
+    if (this.state === State.PHASING) return this.#movePhantom(-1, 0);
     if (this.state !== State.PLAYING) return false;
     if (this.#move(-1, 0)) {
       this.#registerLockReset('move');
@@ -225,6 +255,7 @@ export class Game extends Emitter {
   }
 
   moveRight() {
+    if (this.state === State.PHASING) return this.#movePhantom(1, 0);
     if (this.state !== State.PLAYING) return false;
     if (this.#move(1, 0)) {
       this.#registerLockReset('move');
@@ -235,6 +266,7 @@ export class Game extends Emitter {
   }
 
   softDrop() {
+    if (this.state === State.PHASING) return this.#movePhantom(0, 1);
     if (this.state !== State.PLAYING) return false;
     if (this.#move(0, 1)) {
       this.score.softDrop(1);
@@ -246,6 +278,8 @@ export class Game extends Emitter {
   }
 
   hardDrop() {
+    // While phasing, the drop key commits (seats) the phantom instead.
+    if (this.state === State.PHASING) return this.seatPhase();
     if (this.state !== State.PLAYING) return false;
     let distance = 0;
     while (this.#move(0, 1)) distance++;
@@ -264,6 +298,7 @@ export class Game extends Emitter {
   }
 
   #rotate(direction) {
+    if (this.state === State.PHASING) return this.#rotatePhantom(direction);
     if (this.state !== State.PLAYING) return false;
     const rotated = this.rotate(this.board, this.active, direction);
     if (!rotated) return false;
@@ -272,6 +307,22 @@ export class Game extends Emitter {
     this.#registerLockReset('rotate');
     this.emit('rotate', direction);
     return true;
+  }
+
+  // Free rotation for the phantom: change orientation, nudging horizontally to
+  // stay inside the walls (occupied cells are ignored).
+  #rotatePhantom(direction) {
+    const to = (this.active.rotation + (direction > 0 ? 1 : 3)) % 4;
+    for (const dx of [0, -1, 1, -2, 2]) {
+      const cells = this.active.cells(to, this.active.x + dx, this.active.y);
+      if (this.#inBounds(cells)) {
+        this.active.rotation = to;
+        this.active.x += dx;
+        this.emit('rotate', direction);
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Swap the active piece with the hold slot (once per piece). */
@@ -292,6 +343,107 @@ export class Game extends Emitter {
     // #spawn cleared holdUsed; a hold is only allowed once per active piece.
     this.holdUsed = true;
     this.emit('hold', this.heldPiece);
+    return true;
+  }
+
+  // --- phase piece ---------------------------------------------------------
+
+  /** Enter phase mode: the active piece becomes a phantom that passes through
+   *  the stack. Costs nothing until it is seated; cancelling is free. */
+  activatePhase() {
+    if (!this.rules.enablePhasePiece) return false;
+    if (this.state !== State.PLAYING) return false;
+    if (this.phaseCharges <= 0 || !this.active) return false;
+    this._phaseOrigin = this.active.clone();
+    this.phasing = true;
+    this.state = State.PHASING;
+    this.emit('phasestart');
+    return true;
+  }
+
+  /** Leave phase mode without seating; the original piece resumes falling. */
+  cancelPhase() {
+    if (this.state !== State.PHASING) return false;
+    this.active = this._phaseOrigin;
+    this._phaseOrigin = null;
+    this.phasing = false;
+    this.state = State.PLAYING;
+    this.emit('phaseend', { seated: false });
+    return true;
+  }
+
+  togglePhase() {
+    return this.state === State.PHASING ? this.cancelPhase() : this.activatePhase();
+  }
+
+  // A cell is "covered" (inaccessible from above) when a filled cell sits above
+  // it in the same column.
+  #isCovered(x, y) {
+    for (let yy = y - 1; yy >= 0; yy--) {
+      if (!this.board.isEmpty(x, yy)) return true;
+    }
+    return false;
+  }
+
+  // Lowest y at the current column/rotation where every phantom cell lands in
+  // an empty, covered hole. Null when there is no legal seat here.
+  #findPhaseSeatY() {
+    const rot = this.active.rotation;
+    const x = this.active.x;
+    for (let y = this.board.totalRows - 1; y >= 0; y--) {
+      const cells = this.active.cells(rot, x, y);
+      if (!this.#inBounds(cells)) continue;
+      let ok = true;
+      for (const [cx, cy] of cells) {
+        if (!this.board.isEmpty(cx, cy) || !this.#isCovered(cx, cy)) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) return y;
+    }
+    return null;
+  }
+
+  /** Cells the phantom would fill if seated now, or null if it can't seat. */
+  getPhaseSeatCells() {
+    if (this.state !== State.PHASING || !this.active) return null;
+    const y = this.#findPhaseSeatY();
+    if (y === null) return null;
+    return this.active.cells(this.active.rotation, this.active.x, y);
+  }
+
+  /** Commit the phantom into the buried pocket it currently fits (if any). */
+  seatPhase() {
+    if (this.state !== State.PHASING) return false;
+    const y = this.#findPhaseSeatY();
+    if (y === null) return false; // no buried pocket fits here
+    const type = this.active.type;
+    const cells = this.active.cells(this.active.rotation, this.active.x, y);
+    for (const [cx, cy] of cells) this.board.set(cx, cy, type);
+    this.phaseCharges--;
+    this.phasing = false;
+    this._phaseOrigin = null;
+    this.active = null;
+    this.score.phaseFill(cells.length);
+    this.emit('phasefill', { cells });
+    this.emit('phaseend', { seated: true });
+
+    // Filling a buried hole can complete rows — resolve like a lock.
+    const rows = this.board.getFullRows();
+    if (rows.length > 0) {
+      this.state = State.LINE_CLEARING;
+      this.clearing = {
+        rows,
+        count: rows.length,
+        timer: this.rules.lineClearAnimationMs,
+      };
+      this.emit('lineclearstart', { rows, count: rows.length });
+      if (this.rules.lineClearAnimationMs <= 0) this.#finishClear();
+    } else {
+      this.state = State.PLAYING;
+      this.#spawn();
+    }
     return true;
   }
 
@@ -333,8 +485,21 @@ export class Game extends Emitter {
     this.clearing = null;
     this.emit('lineclear', { rows, count, gained });
     if (this.score.level > prevLevel) this.emit('levelup', this.score.level);
+    this.#accruePhaseCharges();
     this.state = State.PLAYING;
     this.#spawn();
+  }
+
+  // Grant one phase charge for every `linesPerPhaseCharge` cleared lines.
+  #accruePhaseCharges() {
+    if (!this.rules.enablePhasePiece) return;
+    const earned = Math.floor(this.score.lines / this.rules.linesPerPhaseCharge);
+    if (earned > this._phaseEarned) {
+      const added = earned - this._phaseEarned;
+      this._phaseEarned = earned;
+      this.phaseCharges += added;
+      this.emit('phasecharge', this.phaseCharges);
+    }
   }
 
   // --- pause / resume ------------------------------------------------------
@@ -359,6 +524,7 @@ export class Game extends Emitter {
 
   /** Cells of the hard-drop landing position, or null when disabled. */
   getGhostCells() {
+    if (this.state === State.PHASING) return null;
     if (!this.rules.enableGhostPiece || !this.active) return null;
     if (!this._ghostDirty && this._ghostCells) return this._ghostCells;
     let dy = 0;

@@ -85,6 +85,9 @@
         <button id="tb-pause" class="pause-chip" type="button" aria-label="Pause">
           <span aria-hidden="true">II</span>
         </button>
+        <p id="phase-hint" class="phase-hint" role="status" hidden>
+          Slide the phantom into a buried hole · Drop to seat · Phase to cancel
+        </p>
       </div>
 
       <!-- Right panel: next + level/lines -->
@@ -107,6 +110,10 @@
           <div class="stat">
             <dt>Lines</dt>
             <dd id="hud-lines">0</dd>
+          </div>
+          <div class="stat">
+            <dt>Phase</dt>
+            <dd id="hud-phase">0</dd>
           </div>
         </dl>
       </aside>
@@ -134,6 +141,10 @@
         </button>
         <button id="tb-hold" class="tc-btn" type="button" aria-label="Hold piece">
           <span aria-hidden="true">⇄</span>
+        </button>
+        <button id="tb-phase" class="tc-btn tc-phase" type="button"
+          aria-label="Phase piece" disabled>
+          <span aria-hidden="true">✦</span>
         </button>
         <button id="tb-hard" class="tc-btn tc-hard" type="button" aria-label="Hard drop">
           <span aria-hidden="true">⤓</span>

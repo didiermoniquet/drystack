@@ -29,6 +29,12 @@ export const defaultRules = {
   softDropPointsPerCell: 1,
   hardDropPointsPerCell: 2,
 
+  // Phase piece (signature mechanic): a phantom that passes through the stack
+  // and seats only into buried, inaccessible holes.
+  enablePhasePiece: true,
+  linesPerPhaseCharge: 5, // earn one phase charge per N cleared lines
+  phaseFillPointsPerCell: 20, // reward for filling buried cells
+
   // Pluggable subsystems (looked up in registries so they can be swapped later)
   randomizer: 'seven-bag',
   rotationSystem: 'wall-kick',

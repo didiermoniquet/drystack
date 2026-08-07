@@ -258,7 +258,34 @@ h1, h2 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
 }
 .tc-left .tc-btn { width: clamp(56px, 18vw, 84px); }
 .tc-btn.is-pressed { background: var(--accent); color: #04121a; transform: translateY(1px); }
+.tc-btn:disabled { opacity: 0.4; cursor: default; }
 .tc-hard { grid-column: span 2; background: #26324c; }
+.tc-phase.is-armed {
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+  box-shadow: inset 0 0 0 1px var(--accent-2);
+}
+.tc-phase.is-pressed { background: var(--accent-2); color: #120a1f; }
+
+.phase-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 12px;
+  max-width: 94%;
+  background: rgba(18, 24, 38, 0.92);
+  border: 1px solid var(--accent-2);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.78rem;
+  line-height: 1.3;
+  text-align: center;
+}
+body.phasing .board-canvas {
+  box-shadow: 0 0 0 2px var(--accent-2), 0 10px 40px rgba(0, 0, 0, 0.5);
+}
 
 /* ---------------- Overlays ---------------- */
 

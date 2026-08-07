@@ -1,0 +1,118 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { Game, State } from '../src/game/Game.js';
+import { Piece } from '../src/game/Piece.js';
+import { createRules } from '../src/game/rules.js';
+import { seededRng } from './helpers.js';
+
+function newGame(overrides) {
+  const g = new Game(createRules(overrides), { rng: seededRng(999) });
+  g.start();
+  return g;
+}
+
+// Carve a 2x2 buried pocket at columns 4-5, rows 20-21, covered by row 19.
+function buildBuriedPocket(g, { covered = true } = {}) {
+  for (let y = 20; y <= 21; y++) {
+    for (let x = 0; x < 10; x++) {
+      if (x !== 4 && x !== 5) g.board.set(x, y, 'X');
+    }
+  }
+  if (covered) {
+    g.board.set(4, 19, 'X');
+    g.board.set(5, 19, 'X');
+  }
+}
+
+test('phase charges accrue every N cleared lines', () => {
+  const g = newGame({ linesPerPhaseCharge: 1 });
+  for (let x = 0; x < 10; x++) if (x !== 4 && x !== 5) g.board.set(x, 21, 'X');
+  g.active = new Piece('O', 4, 0, 0);
+  g.hardDrop();
+  g.tick(g.rules.lineClearAnimationMs + 10);
+  assert.equal(g.score.lines, 1);
+  assert.equal(g.phaseCharges, 1);
+});
+
+test('no phase charges accrue when the mechanic is disabled', () => {
+  const g = newGame({ enablePhasePiece: false, linesPerPhaseCharge: 1 });
+  for (let x = 0; x < 10; x++) if (x !== 4 && x !== 5) g.board.set(x, 21, 'X');
+  g.active = new Piece('O', 4, 0, 0);
+  g.hardDrop();
+  g.tick(g.rules.lineClearAnimationMs + 10);
+  assert.equal(g.phaseCharges, 0);
+});
+
+test('activating phase requires a charge and enters PHASING', () => {
+  const g = newGame();
+  assert.equal(g.activatePhase(), false); // no charges yet
+  g.phaseCharges = 1;
+  assert.ok(g.activatePhase());
+  assert.equal(g.state, State.PHASING);
+  assert.ok(g.phasing);
+});
+
+test('the phantom passes through locked blocks while positioning', () => {
+  const g = newGame();
+  g.phaseCharges = 1;
+  g.active = new Piece('O', 0, 0, 0);
+  g.board.set(0, 5, 'X'); // an obstacle in the phantom's path
+  g.activatePhase();
+  for (let i = 0; i < 8; i++) g.softDrop(); // move down through the block
+  assert.ok(g.active.y > 5, 'phantom should move past the obstacle row');
+});
+
+test('seating fills a buried pocket and clears the completed lines', () => {
+  const g = newGame();
+  buildBuriedPocket(g, { covered: true });
+  g.phaseCharges = 1;
+  g.active = new Piece('O', 4, 0, 0);
+  let filled = null;
+  g.on('phasefill', (p) => (filled = p));
+  g.activatePhase();
+  assert.ok(g.seatPhase());
+  assert.equal(g.phaseCharges, 0);
+  assert.ok(filled && filled.cells.length === 4);
+  assert.equal(g.state, State.LINE_CLEARING);
+  g.tick(g.rules.lineClearAnimationMs + 10);
+  assert.equal(g.score.lines, 2);
+  assert.equal(g.board.getFullRows().length, 0);
+});
+
+test('seating is rejected when the pocket is not covered (reachable from above)', () => {
+  const g = newGame();
+  buildBuriedPocket(g, { covered: false });
+  g.phaseCharges = 1;
+  g.active = new Piece('O', 4, 0, 0);
+  g.activatePhase();
+  assert.equal(g.seatPhase(), false); // open pocket is not a legal target
+  assert.equal(g.phaseCharges, 1); // charge not spent
+  assert.equal(g.state, State.PHASING);
+});
+
+test('cancelling phase restores the original piece for free', () => {
+  const g = newGame();
+  g.phaseCharges = 1;
+  g.active = new Piece('T', 4, 0, 0);
+  g.activatePhase();
+  g.moveLeft();
+  g.moveLeft();
+  g.softDrop();
+  assert.ok(g.cancelPhase());
+  assert.equal(g.state, State.PLAYING);
+  assert.equal(g.phaseCharges, 1); // free to cancel
+  assert.equal(g.active.x, 4); // restored position
+  assert.equal(g.active.y, 0);
+});
+
+test('getPhaseSeatCells previews a valid seat and is null otherwise', () => {
+  const g = newGame();
+  buildBuriedPocket(g, { covered: true });
+  g.phaseCharges = 1;
+  g.active = new Piece('O', 4, 0, 0);
+  g.activatePhase();
+  const preview = g.getPhaseSeatCells();
+  assert.ok(preview && preview.length === 4);
+  g.moveLeft(); // move away from the pocket → no valid seat
+  assert.equal(g.getPhaseSeatCells(), null);
+});

@@ -15,6 +15,11 @@ dependencies, no backend, no account.
 
 ## Features
 
+- **Phase piece (signature mechanic):** every few cleared lines you earn a
+  charge to summon a *phantom* that passes through the stack and seats **only**
+  into a buried, no-longer-reachable hole — turning covered holes from permanent
+  damage into a recoverable, skill-based rescue. Configurable, and off by a
+  single rule flag.
 - Seven classic tetromino shapes (I, O, T, S, Z, J, L) with a **seven-bag**
   randomizer for fair distribution.
 - **Super Rotation System** wall kicks (with proper I-piece kicks and a stable O).
@@ -44,6 +49,11 @@ dependencies, no backend, no account.
 | ↓ | Soft drop | Z | Rotate counter-clockwise |
 | Space | Hard drop | C / Shift | Hold |
 | P / Esc | Pause | R | Restart |
+| F | Phase piece (summon / cancel) | | |
+
+While a phase piece is active, movement/rotation position the phantom freely
+through the stack, and hard drop **seats** it into the highlighted buried pocket.
+On touch, use the ✦ button (and drop to seat).
 
 Horizontal movement and soft drop support press-and-hold (delayed auto-shift and
 auto-repeat). Gameplay keys don't scroll the page.
@@ -188,6 +198,10 @@ const rules = createRules({
   hardDropPointsPerCell: 2,
   randomizer: 'seven-bag',   // or 'uniform', or a registered custom name
   rotationSystem: 'wall-kick',
+  // Phase piece
+  enablePhasePiece: true,
+  linesPerPhaseCharge: 5,    // earn one phantom per N cleared lines
+  phaseFillPointsPerCell: 20,
 });
 ```
 

@@ -66,6 +66,9 @@ export class TouchInput {
       case 'hold':
         this.input.tap('hold');
         break;
+      case 'phase':
+        this.input.tap('phase');
+        break;
       case 'pause':
         this.onPauseToggle?.();
         break;

@@ -43,7 +43,10 @@ export class UIController {
         high: $('hud-high'),
         level: $('hud-level'),
         lines: $('hud-lines'),
+        phase: $('hud-phase'),
       },
+      phaseBtn: $('tb-phase'),
+      phaseHint: $('phase-hint'),
       menuHigh: $('menu-high'),
       hold: $('hold-canvas'),
       nextList: $('next-list'),
@@ -134,11 +137,41 @@ export class UIController {
     g.on('lineclear', () => this.#updateHud());
     g.on('levelup', () => this.audio.play('levelup'));
     g.on('gameover', (data) => this.#onGameOver(data));
+
+    g.on('phasecharge', () => this.#updatePhase());
+    g.on('phasestart', () => {
+      document.body.classList.add('phasing');
+      if (this.el.phaseHint) this.el.phaseHint.hidden = false;
+      this.#updatePhase();
+    });
+    g.on('phaseend', () => {
+      document.body.classList.remove('phasing');
+      if (this.el.phaseHint) this.el.phaseHint.hidden = true;
+      this.#updatePhase();
+      this.#refreshPieces();
+    });
+    g.on('phasefill', () => this.audio.play('lineclear'));
+  }
+
+  #updatePhase() {
+    if (!this.rules.enablePhasePiece) {
+      if (this.el.phaseBtn) this.el.phaseBtn.hidden = true;
+      return;
+    }
+    const charges = this.game.phaseCharges;
+    if (this.el.hud.phase) this.el.hud.phase.textContent = String(charges);
+    const btn = this.el.phaseBtn;
+    if (btn) {
+      const phasing = this.game.state === State.PHASING;
+      btn.disabled = charges <= 0 && !phasing;
+      btn.classList.toggle('is-armed', charges > 0 || phasing);
+    }
   }
 
   #onStart() {
     this.#updateHud();
     this.#refreshPieces();
+    this.#updatePhase();
   }
 
   #onGameOver(data) {

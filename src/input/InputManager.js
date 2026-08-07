@@ -99,6 +99,9 @@ export class InputManager {
       case 'hold':
         if (this.game.hold()) this.audio?.play('hold');
         break;
+      case 'phase':
+        if (this.game.togglePhase()) this.audio?.play('hold');
+        break;
       default:
         break;
     }

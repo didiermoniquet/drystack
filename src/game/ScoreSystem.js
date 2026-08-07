@@ -48,4 +48,11 @@ export class ScoreSystem {
     this.score += gained;
     return gained;
   }
+
+  /** Reward for seating a phase piece into buried cells. */
+  phaseFill(cells) {
+    const gained = cells * this.rules.phaseFillPointsPerCell;
+    this.score += gained;
+    return gained;
+  }
 }

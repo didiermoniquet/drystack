@@ -58,6 +58,9 @@ export class KeyboardInput {
       case 'ShiftRight':
         this.input.tap('hold');
         break;
+      case 'KeyF':
+        this.input.tap('phase');
+        break;
       case 'KeyP':
       case 'Escape':
         this.onPauseToggle?.();
