@@ -213,6 +213,7 @@ h1, h2 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
   color: var(--accent-2);
   text-shadow: 0 0 10px rgba(167, 139, 250, 0.6);
 }
+.stat-icon { color: var(--accent-2); }
 
 .board-wrap {
   grid-area: board;

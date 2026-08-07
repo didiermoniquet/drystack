@@ -46,6 +46,10 @@
           Full lines clear and score points. Clear more lines at once for a
           bigger bonus. The game speeds up as you level up. If a new piece can't
           fit, it's game over.
+          <br /><br />
+          <strong>Phantom ✦:</strong> clearing lines charges a phantom. Summon it
+          to send a flashing piece through the stack and fill a buried hole you
+          can no longer reach from the top.
         </p>
       </details>
 
@@ -86,7 +90,7 @@
           <span aria-hidden="true">II</span>
         </button>
         <p id="phase-hint" class="phase-hint" role="status" hidden>
-          Slide the phantom into a buried hole · Drop to seat · Phase to cancel
+          Slide the phantom into a buried hole · Drop to place · ✦ / F to cancel
         </p>
       </div>
 
@@ -112,7 +116,7 @@
             <dd id="hud-lines">0</dd>
           </div>
           <div class="stat stat-phase">
-            <dt>Phase</dt>
+            <dt>Phantom <span class="stat-icon" aria-hidden="true">✦</span></dt>
             <dd id="hud-phase">0</dd>
             <div id="phase-meter" class="phase-meter" role="progressbar"
               aria-label="Lines until next phase piece"
@@ -148,7 +152,7 @@
           <span aria-hidden="true">⇄</span>
         </button>
         <button id="tb-phase" class="tc-btn tc-phase" type="button"
-          aria-label="Phase piece" disabled>
+          aria-label="Phantom — phase through to fill a buried hole" disabled>
           <span aria-hidden="true">✦</span>
         </button>
         <button id="tb-hard" class="tc-btn tc-hard" type="button" aria-label="Hard drop">
@@ -231,7 +235,14 @@
         <div><span class="key">C / Shift</span> Hold</div>
         <div><span class="key">P / Esc</span> Pause</div>
         <div><span class="key">R</span> Restart</div>
+        <div><span class="key">F</span> Phantom ✦</div>
       </div>
+      <p class="controls-note">
+        <strong>Phantom ✦:</strong> every few cleared lines you earn a phantom
+        charge. Summon it (F or the ✦ button) to send a flashing piece
+        <em>through</em> the stack and fill a buried hole you can't reach from the
+        top — clearing that line. Move/rotate to line it up; drop to place it.
+      </p>
       <p class="controls-note">
         On touch devices, use the on-screen buttons. Left, right, and soft drop
         support press-and-hold.

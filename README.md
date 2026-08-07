@@ -49,11 +49,13 @@ dependencies, no backend, no account.
 | ↓ | Soft drop | Z | Rotate counter-clockwise |
 | Space | Hard drop | C / Shift | Hold |
 | P / Esc | Pause | R | Restart |
-| F | Phase piece (summon / cancel) | | |
+| F | Phantom ✦ (summon / cancel) | | |
 
-While a phase piece is active, movement/rotation position the phantom freely
-through the stack, and hard drop **seats** it into the highlighted buried pocket.
-On touch, use the ✦ button (and drop to seat).
+The **Phantom ✦** HUD counter shows banked charges (earned per cleared lines);
+the bar beneath it fills toward the next one, and the count glows when one is
+ready. While a phantom is active, movement/rotation position it freely through
+the stack, and hard drop **seats** it into the highlighted buried pocket. On
+touch, use the ✦ button (and drop to seat).
 
 Horizontal movement and soft drop support press-and-hold (delayed auto-shift and
 auto-repeat). Gameplay keys don't scroll the page.
