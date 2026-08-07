@@ -11,6 +11,15 @@ dependencies, no backend, no account.
 > other commercial product. "Tetris" is a trademark of its respective owner.
 > All code and artwork here are original.
 
+## Demo
+
+![The Phantom mechanic: a flashing phantom passes through the stack, seats into a buried hole, and clears two lines](./assets/phantom-demo.gif)
+
+*The signature **Phantom ✦** mechanic — a phantom piece phases through the stack
+to fill a buried hole you can't reach from the top, clearing the line. (Colors
+are posterized by the GIF palette; the live game is full-colour.)*
+[**Play it live →**](https://didiermoniquet.github.io/drystack/)
+
 ---
 
 ## Features
