@@ -189,6 +189,31 @@ h1, h2 { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
   font-variant-numeric: tabular-nums;
 }
 
+/* Phase charge meter: fills as lines are cleared toward the next charge. */
+.phase-meter {
+  width: 100%;
+  min-width: 44px;
+  height: 6px;
+  margin-top: 5px;
+  background: rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.phase-meter > span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent-2);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+/* When at least one charge is ready to use, the count glows; the meter keeps
+   showing true progress toward the following charge. */
+.stat-phase.ready dd {
+  color: var(--accent-2);
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.6);
+}
+
 .board-wrap {
   grid-area: board;
   position: relative;

@@ -111,9 +111,14 @@
             <dt>Lines</dt>
             <dd id="hud-lines">0</dd>
           </div>
-          <div class="stat">
+          <div class="stat stat-phase">
             <dt>Phase</dt>
             <dd id="hud-phase">0</dd>
+            <div id="phase-meter" class="phase-meter" role="progressbar"
+              aria-label="Lines until next phase piece"
+              aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span id="phase-meter-fill"></span>
+            </div>
           </div>
         </dl>
       </aside>

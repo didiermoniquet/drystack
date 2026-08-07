@@ -47,6 +47,9 @@ export class UIController {
       },
       phaseBtn: $('tb-phase'),
       phaseHint: $('phase-hint'),
+      phaseStat: document.querySelector('.stat-phase'),
+      phaseMeter: $('phase-meter'),
+      phaseFill: $('phase-meter-fill'),
       menuHigh: $('menu-high'),
       hold: $('hold-canvas'),
       nextList: $('next-list'),
@@ -134,7 +137,10 @@ export class UIController {
     g.on('lineclearstart', ({ count }) =>
       this.audio.play(count >= 4 ? 'tetris' : 'lineclear')
     );
-    g.on('lineclear', () => this.#updateHud());
+    g.on('lineclear', () => {
+      this.#updateHud();
+      this.#updatePhase();
+    });
     g.on('levelup', () => this.audio.play('levelup'));
     g.on('gameover', (data) => this.#onGameOver(data));
 
@@ -156,10 +162,20 @@ export class UIController {
   #updatePhase() {
     if (!this.rules.enablePhasePiece) {
       if (this.el.phaseBtn) this.el.phaseBtn.hidden = true;
+      if (this.el.phaseStat) this.el.phaseStat.hidden = true;
       return;
     }
     const charges = this.game.phaseCharges;
     if (this.el.hud.phase) this.el.hud.phase.textContent = String(charges);
+
+    // Meter: progress in lines toward the next phase charge.
+    const per = Math.max(1, this.rules.linesPerPhaseCharge);
+    const progress = Math.round(((this.game.score.lines % per) / per) * 100);
+    if (this.el.phaseFill) this.el.phaseFill.style.width = progress + '%';
+    if (this.el.phaseMeter)
+      this.el.phaseMeter.setAttribute('aria-valuenow', String(progress));
+    if (this.el.phaseStat) this.el.phaseStat.classList.toggle('ready', charges > 0);
+
     const btn = this.el.phaseBtn;
     if (btn) {
       const phasing = this.game.state === State.PHASING;
